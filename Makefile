@@ -40,6 +40,7 @@ GENERATION_CNT = 2
 
 all:
 	conda create --name ${CONDA_ENV_NAME} --file ${CONDA_REQS}
+	sleep 1
 	source activate ${CONDA_ENV_NAME}
 	pip install -r ${PIP_REQS}
 	mkdir cnnInputs
