@@ -40,10 +40,11 @@ GENERATION_CNT = 2
 
 all:
 	conda create --name ${CONDA_ENV_NAME} --file ${CONDA_REQS}
+	source activate ${CONDA_ENV_NAME}
 	pip install -r ${PIP_REQS}
 	mkdir cnnInputs
+	@echo "Downloading the libApproxGPUOpsTF.so compiled library!"
 	wget --no-check-certificate -O './cnnInputs/libApproxGPUOpsTF.so' 'https://drive.google.com/uc?export=download&id=1FLB5HJ-qGM-akTcRWBglXN4pUokOWJXr'
-	@echo "Make sure the compiled libApproxGPUOpsTF.so library is placed in the cnnInputs directory!"
 
 train:
 	@python testSetLoad.py
