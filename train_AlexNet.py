@@ -12,19 +12,24 @@
 ##============================================================================##
 
 
-import keras
+import keras, argparse, os
 from keras.models import Sequential
 from keras.layers import Dense, Activation, Dropout, Flatten, Conv2D, MaxPooling2D
 from keras.layers.normalization import BatchNormalization
-import numpy as np
-import sys
 
+import numpy as np
 import tensorflow as tf
 
 physical_devices = tf.config.list_physical_devices('GPU')
 tf.config.set_visible_devices(physical_devices[0:1], 'GPU')
 
 np.random.seed(1000)
+
+# Process arguments
+parser = argparse.ArgumentParser()
+parser.add_argument('--weights', type=str)
+parser.add_argument('--epochs', type=int)
+args = parser.parse_args()
 
 #Instantiation
 AlexNet = Sequential()
@@ -146,15 +151,15 @@ lrr= ReduceLROnPlateau(   monitor='val_accuracy',   factor=.01,   patience=3,  m
 
 #Defining the parameters
 batch_size=64
-epochs=250
+epochs=args.epochs
 learn_rate=.001
 
 #Training the model
 AlexNet.fit(train_generator.flow(x_train, y_train, batch_size=batch_size), epochs = epochs, steps_per_epoch = x_train.shape[0]//batch_size, validation_data = val_generator.flow(x_val, y_val, batch_size=batch_size), validation_steps = x_test.shape[0]//batch_size, callbacks = [lrr], verbose=1)
-AlexNet.save_weights('cnnInputs/AlexNet_weights_norm_250ep')
+AlexNet.save_weights(os.path.join('cnnInputs',args.weights))
 
-print('================================================================================')
-print('Testing trained model #1...')
-score = AlexNet.evaluate(x_test, y_test, verbose=0)
-print('Test loss: {:.3f}'.format(score[0]))
-print('Test accuracy: {:.3f}'.format(score[1]))
+#print('================================================================================')
+#print('Testing trained model #1...')
+#score = AlexNet.evaluate(x_test, y_test, verbose=0)
+#print('Test loss: {:.3f}'.format(score[0]))
+#print('Test accuracy: {:.3f}'.format(score[1]))

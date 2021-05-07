@@ -21,7 +21,7 @@ from pymoo.optimize import minimize
 from pymoo.factory import get_algorithm, get_crossover, get_mutation, get_sampling
 from pymoo.visualization.scatter import Scatter
 import optimSetup as setup
-import subprocess
+import subprocess, os, argparse
 
 
 class ApproxCNNOptimization(Problem):
@@ -47,7 +47,7 @@ class ApproxCNNOptimization(Problem):
         @param x = [index of multiplier for layer 1, multiplier for layer 2 ......]
         """
         m = [setup.BIN_PATH + setup.PREF + setup.mults[layerInd][setup.MULT_NAME] + setup.SUFF for layerInd in x]
-        params = ["python", "eval_AlexNet.py", "--fakeConv", "--m1", m[0], "--m2", m[1], "--m3", m[2], "--m4", m[3], "--m5", m[4]]
+        params = ["python", "eval_AlexNet.py", "--weights", args.weights, "--fakeConv", "--m1", m[0], "--m2", m[1], "--m3", m[2], "--m4", m[3], "--m5", m[4]]
         output = subprocess.check_output(params,universal_newlines=True)
 
         acc = output.split('\n')[-2].split(':')[1].strip()
@@ -64,10 +64,17 @@ class ApproxCNNOptimization(Problem):
         m_en = [setup.mults[layerInd][setup.MULT_EN] for layerInd in x]
         return np.sum(np.multiply(m_en,setup.convLayersMult))/1000
 
+# Process arguments
+parser = argparse.ArgumentParser()
+parser.add_argument('--weights', type=str)
+parser.add_argument('--gen_cnt', type=int)
+parser.add_argument('--gen_size', type=int)
+args = parser.parse_args()
+
 problem = ApproxCNNOptimization(len(setup.mults)-1, len(setup.convLayersMult))
 
 algorithm = get_algorithm("nsga2",
-                       pop_size=50,
+                       pop_size=args.gen_size,
                        sampling=get_sampling("int_random"),
                        crossover=get_crossover("int_sbx", prob=0.5, eta=3.0),
                        mutation=get_mutation("int_pm", eta=3.0),
@@ -76,7 +83,7 @@ algorithm = get_algorithm("nsga2",
 
 res = minimize(problem,
                algorithm,
-               ("n_gen", 50),
+               ("n_gen", args.gen_cnt),
                verbose=True,
                save_history=True,
                seed=1)
@@ -84,11 +91,12 @@ res = minimize(problem,
 for result in res.F:
     result[1] = -result[1]*100
 
-print("Best solution found: %s" % res.X)
-print("Function value:")
+print("Best solutions found: %s" % res.X)
+print("Correspondin [Watts, Accuracy in %] values:")
 for el in res.F:
     print(list(map('{:.2f}'.format, el)))
 
+print("Wait for the plot.....")
 plot = Scatter(labels=["Energy requirements (Watts)", "Accuracy (%)"])
 plot.add(res.F, color="red")
 plot.show()

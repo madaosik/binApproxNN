@@ -17,14 +17,15 @@
 ## $Date:       $2021-05-05
 ##=========================================================================================================##
 
-import keras
+
 from keras.models import Sequential
 from keras.layers import Dense, Activation, Dropout, Flatten, Conv2D, MaxPooling2D
 from keras.layers.normalization import BatchNormalization
+from keras.utils import to_categorical
+
 import numpy as np
 import tensorflow as tf
-import argparse
-from keras.utils import to_categorical
+import keras, os, argparse
 
 from fake_approx_convolutional import FakeApproxConv2D
 
@@ -34,6 +35,7 @@ tf.config.set_visible_devices(physical_devices[0:1], 'GPU')
 
 # Process arguments
 parser = argparse.ArgumentParser()
+parser.add_argument('--weights', type=str)
 parser.add_argument('--fakeConv', action='store_true')
 parser.add_argument('--m1', type=str, help='Approximate multiplication table for layer 1 (8x8)', default='')
 parser.add_argument('--m2', type=str, help='Approximate multiplication table for layer 2 (8x8)', default='')
@@ -128,7 +130,7 @@ AlexNet.add(Activation('softmax'))
 
 # Compiling the model
 AlexNet.compile(loss = keras.losses.categorical_crossentropy, optimizer= 'adam', metrics=['accuracy'])
-AlexNet.load_weights('cnnInputs/AlexNet_weights_norm')
+AlexNet.load_weights(os.path.join('cnnInputs',args.weights))
 
 print('================================================================================')
 if args.fakeConv:
