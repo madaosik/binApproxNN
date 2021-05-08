@@ -65,4 +65,4 @@ nsga2:
 	@export TF_CPP_MIN_LOG_LEVEL="1"
 
 pack:
-	zip -r xlanic04.zip Makefile *.py *.txt runsOutput README.md requirements.txt
+	zip -r xlanic04.zip Makefile *.py runsOutput README.md xlanic04.pdf
