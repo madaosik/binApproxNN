@@ -23,7 +23,6 @@ M5=${MULTS_PATH}${MULT5_NAME}${MULTS_SUFF}
 #### MODIFIABLE SETTINGS
 WEIGHTS_NAME=myAlexNetWeights
 TRAIN_EPOCHS=2
-CONDA_ENV_NAME=binProjEnv
 
 # Test multipliers ONLY for the purposes of the approx_eval target - can be edited
 MULT1_NAME=EXZ
@@ -34,15 +33,11 @@ MULT5_NAME=ZFB
 #### -----------------------------------------------------------------------------
 
 # NSGA-II ALGORITHM SETTINGS
-GENERATION_SIZE = 3
-GENERATION_CNT = 2
+GENERATION_SIZE = 70
+GENERATION_CNT = 20
 
 
-all:
-	conda create --name ${CONDA_ENV_NAME} --file ${CONDA_REQS}
-	sleep 1
-	source activate ${CONDA_ENV_NAME}
-	pip install -r ${PIP_REQS}
+approxLib:
 	mkdir cnnInputs
 	@echo "Downloading the libApproxGPUOpsTF.so compiled library!"
 	wget --no-check-certificate -O './cnnInputs/libApproxGPUOpsTF.so' 'https://drive.google.com/uc?export=download&id=1FLB5HJ-qGM-akTcRWBglXN4pUokOWJXr'
